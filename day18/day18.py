@@ -10,15 +10,7 @@ def import_input(filename, n=-1, w=71, h=71):
             grid[coords[1]][coords[0]] = 1
     return grid
 
-if __name__ == "__main__":
-    # full_grid denotes safe tiles w/ -1 and unsafe tiles with the first turn they become unsafe
-    # e.g., if dist=1 (turn 1), then 1 can no longer be added to the open list
-    
-    # width, height = 7, 7
-    # full_grid = import_input("test.txt", n=12, w=width, h=height)
-    # print(full_grid)
-    width, height = 71, 71
-    full_grid = import_input("day18.txt", n=1024)
+def pathing(full_grid, width=71, height=71):
     dist_grid = [[(width*height*width)]*width for _ in range(height)]
     dist_grid[0][0] = 0
     # Heap tuples are in form (dist,x,y)
@@ -47,5 +39,38 @@ if __name__ == "__main__":
         if y < height-1 and full_grid[y+1][x] == 0 and (new_dist) < dist_grid[y+1][x]:
             heapq.heappush(open, (new_dist, x, y+1))
             dist_grid[y+1][x] = new_dist
-    print(f"Result: {dist_grid[height-1][width-1]}")
-        
+    res = dist_grid[height-1][width-1]
+    return res
+
+def get_num_of_coords(filename="day18.txt"):
+    with open(filename, 'r') as f:
+        return len(f.readlines())
+def get_coord_of(n, filename="day18.txt"):
+    last_coords = None
+    with open(filename, 'r') as f:
+        for i, line in enumerate(f):
+            if n > 0 and i >= n:
+                break
+            last_coords = [int(c) for c in line.rstrip().split(',')]
+    return last_coords
+
+if __name__ == "__main__":
+    # full_grid denotes safe tiles w/ -1 and unsafe tiles with the first turn they become unsafe
+    # e.g., if dist=1 (turn 1), then 1 can no longer be added to the open list
+    
+    # width, height = 7, 7
+    # full_grid = import_input("test.txt", n=12, w=width, h=height)
+    # print(full_grid)
+    width, height = 71, 71
+    full_grid = import_input("day18.txt", n=1024)
+    
+    print(f"Result A: {pathing(full_grid)}")
+    for n in range(1025,get_num_of_coords()):
+        print(f"run n={n}")
+        full_grid = import_input("day18.txt", n=n)
+        res = pathing(full_grid)
+        if res >= width*height*width:
+            print(get_coord_of(n))
+            break
+    
+
